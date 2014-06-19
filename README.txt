@@ -1,25 +1,35 @@
-This is the github repository for the Bat Listener device.
-This project is based upon a design from Elektor Electronic magazine
+This is the github repository for the Latrine Logger.
 
-The PCB was re-designed by by Matt Little from Renewable Energy Innovation.
+This work has been done by James Fowkes, Nicola Greene and Matt Little from Renewable Energy Innovation.
+
 Contact:
 www.re-innovation.co.uk
 matt@re-innovation.co.uk
 
 Overview:
 
-This detects ultrasonic frequencies, such as those emitted by bats.
-The circuit filters and frequency shifts them down to human audiable level. 
-The output is a small loudspeaker.
+This is a prototype unit developed for Water For People to monitor the use of pit latrines in various locations in Uganda.
+This is based upon the DataDuino datalogging platform, but with some changes.
+A 555 timer based capacitance to frequency unit is used to detect a 'flush'
+The duration of the flush is measured and written, along with a date and time-stamp, to an SD card.
+This is all based upon an ATmega328 programmed with the Arduino bootloader.
+Code has been written for the Arudino IDE.
 
 see www.re-innovation.co.uk for more details
+
+The Arduino files are zipped and include a library and a full sketch.
+The files are:
+LatrineSensor which needs to go in your Library folder. This includes an example.
+LatrineLogger_v6 is the full sketch for data logging. 
+
 
 
 Files in the repository:
 	
 	Readme
 	PCB files for KiCAD
-	PCB gerber files
+	Instructions
+	Arduino code
 
 
 Modified:
@@ -28,4 +38,4 @@ Modified:
 
 To Do:
 
-Build enclosure for the kit.
+Upload the PCB files
