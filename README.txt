@@ -17,12 +17,12 @@ Code has been written for the Arudino IDE.
 
 see www.re-innovation.co.uk for more details
 
-The Arduino files are zipped and include a library and a full sketch.
+The Arduino files are include a library and a full sketch.
 The files are:
-LatrineSensor which needs to go in your Library folder. This includes an example.
-LatrineLogger_v6 is the full sketch for data logging. 
+libaries/LatrineSensor which needs to go in your Arduino libraries folder. This includes an example.
+LatrineLogger is the full sketch for data logging. 
 
-
+Previous commits in this repository include the Arduino code as a ZIP file.
 
 Files in the repository:
 	
