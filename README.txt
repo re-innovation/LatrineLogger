@@ -24,6 +24,12 @@ LatrineLogger is the full sketch for data logging.
 
 Previous commits in this repository include the Arduino code as a ZIP file.
 
+The code also requires the following third-party Arduino libraries:
+Rtc_Pcf8563 (http://playground.arduino.cc/Main/RTC-PCF8563)
+SdFat (https://github.com/greiman/SdFat)
+
+Both of these must exists in your Arduino libraries folder.
+
 Files in the repository:
 	
 	Readme
