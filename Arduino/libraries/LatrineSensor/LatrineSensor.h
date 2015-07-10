@@ -4,7 +4,11 @@
 #include <stdint.h>
 
 #ifndef UNITY_TEST
+#ifdef ARDUNIO
 #include <Arduino.h>
+#else
+#include <avr/io.h>
+#endif
 #endif
 
 typedef void(*LS_START_CB)(void);
