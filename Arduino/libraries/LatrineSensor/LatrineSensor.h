@@ -3,14 +3,6 @@
 
 #include <stdint.h>
 
-#ifndef UNITY_TEST
-#ifdef ARDUNIO
-#include <Arduino.h>
-#else
-#include <avr/io.h>
-#endif
-#endif
-
 typedef void(*LS_START_CB)(void);
 typedef void(*LS_END_CB)(uint16_t durationInSeconds);
 
