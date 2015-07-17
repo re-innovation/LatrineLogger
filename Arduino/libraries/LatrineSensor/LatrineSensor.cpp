@@ -32,7 +32,6 @@ static const unsigned long UPDATE_TICK_MS = 1000;
  */
 
 static volatile uint32_t s_overflowCount = 0;
-static volatile uint32_t s_bad_isr_count = 0;
 
 LatrineSensor::LatrineSensor(LS_START_CB pFnStart, LS_END_CB pFnEnd, bool bEmitDebugInfo)
 {
@@ -131,7 +130,7 @@ uint32_t LatrineSensor::updateTask(uint32_t count)
 	
 	if (m_bEmitDebugInfo) { emitDebugInfo(count); }
 	
-	return s_bad_isr_count;
+	return count;
 }
 
 uint32_t LatrineSensor::GetFlushStartThreshold(void)
@@ -219,12 +218,9 @@ uint16_t LatrineSensor::getFlushDurationInSeconds(void)
 	return (m_flushDurationMs + 500) / 1000;
 }
 
-ISR(TIM1_OVF_vect)
+ISR(TIMER1_OVF_vect)
 {
 	s_overflowCount++;
 }
 
-ISR(BADISR_vect)
-{
-	s_bad_isr_count++;
-}
+ISR(BADISR_vect) {}

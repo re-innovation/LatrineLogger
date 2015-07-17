@@ -37,4 +37,3 @@ void onFlushEnd(uint16_t durationinSeconds)
   Serial.print(durationinSeconds);
   Serial.println(" seconds)");
 }
-
