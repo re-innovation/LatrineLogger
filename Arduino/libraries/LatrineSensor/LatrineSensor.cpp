@@ -6,7 +6,7 @@
 #include <iostream>
 #endif
  
-#ifdef Arduino
+#ifdef ARDUINO
 #include <Arduino.h>
 #endif
 
@@ -73,6 +73,7 @@ bool LatrineSensor::IsFlushing(void) { return m_flushState == STATE_FLUSHING; }
 void LatrineSensor::emitDebugInfo(uint16_t lastCount)
 {
 	#ifndef UNITY_TEST
+	#ifdef ARDUINO
 	Serial.print("A=");
 	Serial.print(m_averageHigh);
 	Serial.print(", C=");
@@ -83,6 +84,7 @@ void LatrineSensor::emitDebugInfo(uint16_t lastCount)
 	Serial.print(m_flushEndThreshold);
 	Serial.print(", S=");
 	Serial.println(m_flushState);
+	#endif
 	#else
 	std::cout << "A=" << m_averageHigh << ", C=" << lastCount << ", FS=" << m_flushStartThreshold << ", FE=" << m_flushEndThreshold << ", S=" << m_flushState << std::endl;
     #endif
