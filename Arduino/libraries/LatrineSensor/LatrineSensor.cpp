@@ -14,18 +14,25 @@
 
 #ifndef UNITY_TEST
 #include <util/atomic.h>
+#include <avr/interrupt.h>
 #endif
 
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-
 /*
  * Constants (might become private class variables?)
  */
 
 static const unsigned long UPDATE_TICK_MS = 1000;
+
+/*
+ * Private Module Variables
+ */
+
+static volatile uint32_t s_overflowCount = 0;
+static volatile uint32_t s_bad_isr_count = 0;
 
 LatrineSensor::LatrineSensor(LS_START_CB pFnStart, LS_END_CB pFnEnd, bool bEmitDebugInfo)
 {
@@ -58,19 +65,20 @@ void LatrineSensor::Setup(void)
 	TCCR1A = 0; // Output compare off, waveform generation off
 	TCCR1B = 0x06; // Input capture off, waveform generation off, clock source external falling edge
 	TCNT1 = 0;
+	TIMSK1 = (1 << TOIE1); // Enable overflow interrupt for Timer1
 	#endif
 }
 
 #ifndef UNITY_TEST
-uint16_t LatrineSensor::Update(void){ return updateTask(); }
+uint32_t LatrineSensor::Update(void){ return updateTask(); }
 #else
-uint16_t LatrineSensor::Update(uint16_t count) { return updateTask(count); }
+uint32_t LatrineSensor::Update(uint32_t count) { return updateTask(count); }
 #endif
 
 bool LatrineSensor::IsCalibrating(void) { return m_flushState == STATE_CALIBRATING; }
 bool LatrineSensor::IsFlushing(void) { return m_flushState == STATE_FLUSHING; }
 	
-void LatrineSensor::emitDebugInfo(uint16_t lastCount)
+void LatrineSensor::emitDebugInfo(uint32_t lastCount)
 {
 	#ifndef UNITY_TEST
 	#ifdef ARDUINO
@@ -91,18 +99,21 @@ void LatrineSensor::emitDebugInfo(uint16_t lastCount)
 }
 
 #ifndef UNITY_TEST
-uint16_t LatrineSensor::updateTask(void)
+uint32_t LatrineSensor::updateTask(void)
 #else
-uint16_t LatrineSensor::updateTask(uint16_t count)
+uint32_t LatrineSensor::updateTask(uint32_t count)
 #endif
 {
 	#ifndef UNITY_TEST
-	volatile uint16_t count;
+	volatile uint32_t count;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
 		count = TCNT1;
 		TCNT1 = 0;
 	}
+
+	count += (s_overflowCount * 0xFFFF);
+	s_overflowCount = 0;
 	#endif
 	
 	switch(m_flushState)
@@ -120,15 +131,15 @@ uint16_t LatrineSensor::updateTask(uint16_t count)
 	
 	if (m_bEmitDebugInfo) { emitDebugInfo(count); }
 	
-	return count;
+	return s_bad_isr_count;
 }
 
-uint16_t LatrineSensor::GetFlushStartThreshold(void)
+uint32_t LatrineSensor::GetFlushStartThreshold(void)
 {
 	return m_flushStartThreshold;
 }
 
-uint16_t LatrineSensor::GetFlushEndThreshold(void)
+uint32_t LatrineSensor::GetFlushEndThreshold(void)
 {
 	return m_flushEndThreshold;
 }
@@ -138,7 +149,7 @@ void LatrineSensor::SetSensitivity(uint16_t newSensitivity)
     m_sensitivity = newSensitivity;
 }
 
-void LatrineSensor::updateCalibration(uint16_t lastCount)
+void LatrineSensor::updateCalibration(uint32_t lastCount)
 {
 	static uint32_t calibCount = 0;
 
@@ -152,19 +163,19 @@ void LatrineSensor::updateCalibration(uint16_t lastCount)
 	}
 }
 
-void LatrineSensor::updateStartThreshold(uint16_t lastCount)
+void LatrineSensor::updateStartThreshold(uint32_t lastCount)
 {
 	m_averageHigh = (m_averageHigh + lastCount) / 2;
 	m_flushStartThreshold = m_averageHigh - m_sensitivity;
 }
 
-void LatrineSensor::updateEndThreshold(uint16_t lastCount)
+void LatrineSensor::updateEndThreshold(uint32_t lastCount)
 {
 	m_minimumLow = min(lastCount, m_minimumLow);
 	m_flushEndThreshold = m_minimumLow + m_sensitivity;
 }
 
-void LatrineSensor::handleIdleFlush(uint16_t count)
+void LatrineSensor::handleIdleFlush(uint32_t count)
 {
 	if (count < m_flushStartThreshold)
 	{
@@ -179,7 +190,7 @@ void LatrineSensor::handleIdleFlush(uint16_t count)
 	}
 }
 
-void LatrineSensor::handleFlushing(uint16_t count)
+void LatrineSensor::handleFlushing(uint32_t count)
 {
 	updateEndThreshold(count);
 	updateFlushDuration();
@@ -208,3 +219,12 @@ uint16_t LatrineSensor::getFlushDurationInSeconds(void)
 	return (m_flushDurationMs + 500) / 1000;
 }
 
+ISR(TIM1_OVF_vect)
+{
+	s_overflowCount++;
+}
+
+ISR(BADISR_vect)
+{
+	s_bad_isr_count++;
+}

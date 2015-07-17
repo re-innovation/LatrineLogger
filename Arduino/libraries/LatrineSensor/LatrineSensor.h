@@ -11,16 +11,16 @@ class LatrineSensor
 public:
 	LatrineSensor(LS_START_CB pFnStart, LS_END_CB pFnEnd, bool bEmitDebugInfo = false);
 	#ifndef UNITY_TEST
-	uint16_t Update(void);
+	uint32_t Update(void);
 	#else
-	uint16_t Update(uint16_t count);
+	uint32_t Update(uint32_t count);
 	#endif
 	void Setup(void);
 	bool IsCalibrating(void);
 	bool IsFlushing(void);
 	
-	uint16_t GetFlushStartThreshold(void);
-	uint16_t GetFlushEndThreshold(void);
+	uint32_t GetFlushStartThreshold(void);
+	uint32_t GetFlushEndThreshold(void);
     
     void SetSensitivity(uint16_t newSensitivity);
 private:
@@ -53,22 +53,21 @@ private:
 	uint16_t m_flushState;
 
 	#ifndef UNITY_TEST
-	uint16_t updateTask(void);
+	uint32_t updateTask(void);
 	#else
-	uint16_t updateTask(uint16_t count);
+	uint32_t updateTask(uint32_t count);
 	#endif
 	
-	void updateCalibration(uint16_t lastCount);
-	void updateStartThreshold(uint16_t lastCount);
-	void updateEndThreshold(uint16_t lastCount);
-	void handleIdleFlush(uint16_t count);
-	void handleFlushing(uint16_t count);
+	void updateCalibration(uint32_t lastCount);
+	void updateStartThreshold(uint32_t lastCount);
+	void updateEndThreshold(uint32_t lastCount);
+	void handleIdleFlush(uint32_t count);
+	void handleFlushing(uint32_t count);
 	
 	void resetFlushDuration(void);
 	void updateFlushDuration(void);
 	uint16_t getFlushDurationInSeconds(void);
-	void emitDebugInfo(uint16_t lastCount);
+	void emitDebugInfo(uint32_t lastCount);
 };
-
 
 #endif
