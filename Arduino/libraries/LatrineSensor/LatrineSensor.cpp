@@ -6,6 +6,10 @@
 #include <iostream>
 #endif
  
+#ifdef Arduino
+#include <Arduino.h>
+#endif
+
 #include <LatrineSensor.h>
 
 #ifndef UNITY_TEST
