@@ -218,3 +218,11 @@ pip-log.txt
 ## Build/Test Artifacts
 #############
 *.exe
+*.o
+
+#############
+## Sublime Text project/workspace
+############
+*.sublime-project
+*.sublime-workspace
+
